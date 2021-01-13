@@ -110,6 +110,11 @@ export class RelationMetadata {
     persistenceEnabled: boolean = true;
 
     /**
+     * When a child row is removed from its parent, determines if the child row should be orphaned (default) or deleted.
+     */
+    orphanedRowAction?: "nullify" | "delete";
+
+    /**
      * If set to true then related objects are allowed to be inserted to the database.
      */
     isCascadeInsert: boolean = false;
@@ -123,6 +128,16 @@ export class RelationMetadata {
      * If set to true then related objects are allowed to be remove from the database.
      */
     isCascadeRemove: boolean = false;
+
+    /**
+     * If set to true then related objects are allowed to be soft-removed from the database.
+     */
+    isCascadeSoftRemove: boolean = false;
+
+    /**
+     * If set to true then related objects are allowed to be recovered from the database.
+     */
+    isCascadeRecover: boolean = false;
 
     /**
      * Indicates if relation column value can be nullable or not.
@@ -271,9 +286,16 @@ export class RelationMetadata {
             this.givenInverseSidePropertyFactory = args.inverseSideProperty;
 
         this.isLazy = args.isLazy || false;
-        this.isCascadeInsert = args.options.cascade === true || (args.options.cascade instanceof Array && args.options.cascade.indexOf("insert") !== -1);
-        this.isCascadeUpdate = args.options.cascade === true || (args.options.cascade instanceof Array && args.options.cascade.indexOf("update") !== -1);
-        this.isCascadeRemove = args.options.cascade === true || (args.options.cascade instanceof Array && args.options.cascade.indexOf("remove") !== -1);
+        // this.isCascadeInsert = args.options.cascade === true || (args.options.cascade instanceof Array && args.options.cascade.indexOf("insert") !== -1);
+        // this.isCascadeUpdate = args.options.cascade === true || (args.options.cascade instanceof Array && args.options.cascade.indexOf("update") !== -1);
+        // this.isCascadeRemove = args.options.cascade === true || (args.options.cascade instanceof Array && args.options.cascade.indexOf("remove") !== -1);
+        // this.isCascadeSoftRemove = args.options.cascade === true || (args.options.cascade instanceof Array && args.options.cascade.indexOf("soft-remove") !== -1);
+        // this.isCascadeRecover = args.options.cascade === true || (args.options.cascade instanceof Array && args.options.cascade.indexOf("recover") !== -1);
+        this.isCascadeInsert = args.options.cascade === true || (Array.isArray(args.options.cascade) && args.options.cascade.indexOf("insert") !== -1);
+        this.isCascadeUpdate = args.options.cascade === true || (Array.isArray(args.options.cascade) && args.options.cascade.indexOf("update") !== -1);
+        this.isCascadeRemove = args.options.cascade === true || (Array.isArray(args.options.cascade) && args.options.cascade.indexOf("remove") !== -1);
+        this.isCascadeSoftRemove = args.options.cascade === true || (Array.isArray(args.options.cascade) && args.options.cascade.indexOf("soft-remove") !== -1);
+        this.isCascadeRecover = args.options.cascade === true || (Array.isArray(args.options.cascade) && args.options.cascade.indexOf("recover") !== -1);
         this.isPrimary = args.options.primary || false;
         this.isNullable = args.options.nullable === false || this.isPrimary ? false : true;
         this.onDelete = args.options.onDelete;
@@ -281,6 +303,7 @@ export class RelationMetadata {
         this.deferrable = args.options.deferrable;
         this.isEager = args.options.eager || false;
         this.persistenceEnabled = args.options.persistence === false ? false : true;
+        this.orphanedRowAction = args.options.orphanedRowAction || "nullify";
         this.isTreeParent = args.isTreeParent || false;
         this.isTreeChildren = args.isTreeChildren || false;
         this.type = args.type instanceof Function ? (args.type as () => any)() : args.type;
